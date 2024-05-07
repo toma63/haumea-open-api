@@ -6,7 +6,7 @@ const baseURL = "https://www.swapi.tech/api/people";
 const peopleContainer = document.getElementById('people-container');
 async function fetchRecords() {
     try {
-      const response = await fetch('https://www.swapi.tech/api/people');
+      const response = await fetch(baseURL);
       
       if (!response.ok) {
         throw new Error('Request failed');
