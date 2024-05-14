@@ -4,13 +4,6 @@
 // fetch to get record count and then fetch all pages
 const baseURL = "https://www.swapi.tech/api/people";
 const peopleContainer = document.getElementById('people-container');
-const onePersonContainer = document.getElementById('one-person-container');
-const onePersonHeader = document.getElementById('one-person-header');
-const personDetails = document.getElementById('person-details'); // ul of details
-const doneButton = document.getElementById('done-button');
-
-// show person details only when clicked
-onePersonContainer.hidden = true;
 
 async function fetchRecords() {
     try {
@@ -58,43 +51,20 @@ async function getAllPages(urls) {
         peopleContainer.appendChild(personElt);
         // add an even handler for a click of the person.
         personElt.addEventListener('click', () => {
-          // clear any previous person information
-          while (personDetails.firstChild) {
-            personDetails.removeChild(personDetails.firstChild);
-          }
-          // fetch and display the person details
-          fetch(personURL).then((res) => {
-            if (!res.ok) {
-              throw new Error("Error fetching data");
-            }
-            return res.json();
-          }).then((data) => {
-              for (let propKey in data.result.properties) {
-                if (propKey == 'homeworld' || propKey == 'url') {
-                  continue;  // skip these for now
-                }
-                if (propKey == 'name') {
-                  onePersonHeader.innerText = data.result.properties[propKey];
-                }
-                else {
-                  let propItem = document.createElement('li');
-                  propItem.innerText = `${propKey}: ${data.result.properties[propKey]}`;
-                  personDetails.appendChild(propItem);
-                }
-              }
-              onePersonContainer.hidden = false;
-              window.scrollTo(0, 0);
-            }).catch((err) => {
-              console.log(err);
-            });
+          // load a different page
+          // pass the url as a param
+          const personUrlFile = './person.html';
+          const params = new URLSearchParams();
+          params.append("url", personURL);
+          const paramsURL = personUrlFile + '?' + params.toString();
+          console.log("paramsURL: ", paramsURL);
+          window.location.href = paramsURL;
         });
       }
       return finalList;
     });
 
-    doneButton.addEventListener('click', () => {
-      onePersonContainer.hidden = true;
-    })
+   
 
     //console.log(finalResult);
     //console.log(finalResult.length);
