@@ -18,6 +18,7 @@ fetch(personURL).then((res) => {
     return res.json();
 }).then((data) => {
     for (let propKey in data.result.properties) {
+        console.log("propkey", propKey);
         if (propKey == 'homeworld' || propKey == 'url') {
             continue;  // skip these for now
         }
