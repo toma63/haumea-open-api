@@ -48,46 +48,14 @@ async function getAllPages(urls) {
         console.log("finalList: ", finalList);
       for (let person of finalList) {
         let personElt = document.createElement("div");
-        let personURL = person.url;
-        //personElt.setAttribute('data-detailURL', person.url); // save the url 
-        personElt.className = 'person';
+        personElt.setAttribute('data-detailURL', person.url); // save the url 
+        personElt.classList.add('person');
+        personElt.classList.add('clickable');
         // add a header with the person's name
         personHeader = document.createElement("h2");
         personHeader.innerText = person.name;
         personElt.appendChild(personHeader);
         peopleContainer.appendChild(personElt);
-        // add an even handler for a click of the person.
-        personElt.addEventListener('click', () => {
-          // clear any previous person information
-          while (personDetails.firstChild) {
-            personDetails.removeChild(personDetails.firstChild);
-          }
-          // fetch and display the person details
-          fetch(personURL).then((res) => {
-            if (!res.ok) {
-              throw new Error("Error fetching data");
-            }
-            return res.json();
-          }).then((data) => {
-              for (let propKey in data.result.properties) {
-                if (propKey == 'homeworld' || propKey == 'url') {
-                  continue;  // skip these for now
-                }
-                if (propKey == 'name') {
-                  onePersonHeader.innerText = data.result.properties[propKey];
-                }
-                else {
-                  let propItem = document.createElement('li');
-                  propItem.innerText = `${propKey}: ${data.result.properties[propKey]}`;
-                  personDetails.appendChild(propItem);
-                }
-              }
-              onePersonContainer.hidden = false;
-              window.scrollTo(0, 0);
-            }).catch((err) => {
-              console.log(err);
-            });
-        });
       }
       return finalList;
     });
@@ -98,6 +66,50 @@ async function getAllPages(urls) {
 
     //console.log(finalResult);
     //console.log(finalResult.length);
+}
+
+// single event handler
+peopleContainer.addEventListener('click', (event) => {
+  if (event.target && event.target.closest('.clickable')) {
+    let target = event.target.closest('.clickable');
+    console.log('Clicked element:', target);
+    // Get the id and do a second fetch
+    let url = target.getAttribute('data-detailURL');
+    getPersonDetails(url);
+  }
+} );
+
+async function getPersonDetails(url) {
+  // clear previous details
+  personDetails.innerHTML = '';
+  try {
+    // fetch details for the selected character
+    const response = await fetch(url);
+
+    if (!response.ok) {
+      throw new Error('detail fetch failed');
+    }
+
+    let details = await response.json();
+    for (let propKey in details.result.properties) {
+      if (propKey == 'homeworld' || propKey == 'url') {
+        continue;  // skip these for now
+      }
+      if (propKey == 'name') {
+        onePersonHeader.innerText = details.result.properties[propKey];
+      }
+      else {
+        let propItem = document.createElement('li');
+        propItem.innerText = `${propKey}: ${details.result.properties[propKey]}`;
+        personDetails.appendChild(propItem);
+      }
+    }
+    onePersonContainer.hidden = false;
+    window.scrollTo(0, 0);
+  }
+  catch(error) {
+    console.log('An error occurred during the detail fetch: ', error);
+  }
 }
 
 
